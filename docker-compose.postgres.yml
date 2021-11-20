@@ -3,10 +3,9 @@
 version: "2.4"
 
 services:
-  mysql:
-    container_name: mysql_mattermost
-    image: mysql:${MYSQL_IMAGE_TAG}
-    command: --default-authentication-plugin=mysql_native_password
+  postgres:
+    container_name: postgres_mattermost
+    image: postgres:${POSTGRES_IMAGE_TAG}
     restart: ${RESTART_POLICY}
     security_opt:
       - no-new-privileges:true
@@ -14,21 +13,21 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-      - /var/run/mysql
+      - /var/run/postgresql
     volumes:
-      - ${MYSQL_DATA_PATH}:/var/lib/mysql
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
     environment:
       # timezone inside container
       - TZ
 
       # necessary Postgres options/variables
-      - MYSQL_USER
-      - MYSQL_PASSWORD
-      - MYSQL_DATABASE
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
 
   mattermost:
     depends_on:
-      - mysql
+      - postgres
     container_name: mattermost
     image: mattermost/${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
     restart: ${RESTART_POLICY}
